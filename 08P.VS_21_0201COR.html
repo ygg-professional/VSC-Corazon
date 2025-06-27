@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Corazón en movimiento - centrado</title>
+<style>
+  body { margin: 0; overflow: hidden; }
+</style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script>
+  const renderizador = new THREE.WebGLRenderer({antialias: true});
+  document.body.appendChild(renderizador.domElement);
+
+  // Ajustes de tamaño inicial
+  let ancho = window.innerWidth;
+  let alto = window.innerHeight;
+
+  renderizador.setSize(ancho, alto);
+
+  // Cámara perspectiva, como en tu código original
+  const camara = new THREE.PerspectiveCamera(45, ancho / alto, 1, 1000);
+  camara.position.x = 15 / 2; // Centrado en X
+  camara.position.y = 13 / 2; // Centrado en Y inicial
+  camara.position.z = 100;    // Alejamos la cámara para que no se vea tan grande
+
+  // Escena
+  const escena = new THREE.Scene();
+
+  // Material de la línea
+  const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
+
+  // Coordenadas del corazón
+  const Puntos = [];
+  Puntos.push(new THREE.Vector3(8, 1, 0));
+  Puntos.push(new THREE.Vector3(1, 8, 0));
+  Puntos.push(new THREE.Vector3(1, 11, 0));
+  Puntos.push(new THREE.Vector3(3, 13, 0));
+  Puntos.push(new THREE.Vector3(6, 13, 0));
+  Puntos.push(new THREE.Vector3(8, 11, 0));
+  Puntos.push(new THREE.Vector3(10, 13, 0));
+  Puntos.push(new THREE.Vector3(13, 13, 0));
+  Puntos.push(new THREE.Vector3(15, 11, 0));
+  Puntos.push(new THREE.Vector3(15, 8, 0));
+  Puntos.push(new THREE.Vector3(8, 1, 0));
+
+  const Geometria = new THREE.BufferGeometry().setFromPoints(Puntos);
+  const Linea = new THREE.Line(Geometria, material);
+  escena.add(Linea);
+
+  // Centrar la línea horizontalmente
+  Linea.position.x = 0; // La cámara ya está centrada en X
+  Linea.position.y = 0;
+
+  // Variables de animación
+  let i = 0;
+  let des = true;
+  const velocidad = 1.5; // Más rápido (puedes subirlo más si quieres)
+
+  // Límites de movimiento (puedes ajustarlos si quieres más o menos margen)
+  const minY = -20;
+  const maxY = 20;
+
+  function Update() {
+    requestAnimationFrame(Update);
+
+    // Movimiento vertical
+    if ((Linea.position.y < maxY) && des === true) {
+      Linea.position.y += velocidad;
+      des = true;
+    } else {
+      des = false;
+      if ((Linea.position.y > minY) && des === false) {
+        Linea.position.y -= velocidad;
+        des = false;
+      } else {
+        des = true;
+        Linea.position.y = minY;
+      }
+    }
+
+    renderizador.render(escena, camara);
+  }
+
+  Update();
+
+  // Ajuste de cámara y renderizador al cambiar tamaño de ventana
+  window.addEventListener('resize', () => {
+    ancho = window.innerWidth;
+    alto = window.innerHeight;
+    renderizador.setSize(ancho, alto);
+    camara.aspect = ancho / alto;
+    camara.updateProjectionMatrix();
+  });
+</script>
+</body>
+</html>
